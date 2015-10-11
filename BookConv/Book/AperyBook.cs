@@ -67,11 +67,11 @@ namespace Apery
 
         public static readonly ulong ZobTurn = 0x3fa51fd0a8bb5298;
 
-        private Dictionary<ulong, List<AperyBookEntry>> bookCollection;
+        private SortedDictionary<ulong, List<AperyBookEntry>> bookCollection;
 
         public AperyBook()
         {
-            this.bookCollection = new Dictionary<ulong, List<AperyBookEntry>>();
+            this.bookCollection = new SortedDictionary<ulong, List<AperyBookEntry>>();
         }
 
         /// <summary>
