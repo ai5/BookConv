@@ -68,20 +68,23 @@ namespace ShogiLib
             AperyBook aperyBook = new AperyBook();
             SPosition position = new SPosition();
             book.ClearCount();
+            int cnt = 0;
 
             foreach (SBookState state in book.BookStates)
             {
-                if (book.BookStates[0].Position != string.Empty)
+                if (state.Position != string.Empty)
                 {
                     // 局面が入っている場合
-                    Sfen.PositionFromString(position, book.BookStates[0].Position);
+                    Sfen.PositionFromString(position, state.Position);
                 }
 
                 // 指し手出力
-                if (state.Count == 0)
+                if (state.Count == 0 && ((state.Id == 0) || (state.Position != string.Empty)))
                 {
                     WriteMoves(state, position, aperyBook);
                 }
+
+                cnt++;
             }
 
             aperyBook.Save(filename);
@@ -230,7 +233,6 @@ namespace ShogiLib
                     int index = (int)piece.ConvAperyPiece();
 
                     key ^= AperyBook.ZobPiece[index][(int)ap];
-                    Debug.Print("{0} {1}", ((int)ap).ToString("X2"), key.ToString("X16"));
                 }
             }
 
