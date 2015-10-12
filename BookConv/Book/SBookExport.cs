@@ -136,15 +136,15 @@ namespace ShogiLib
         {
             int fromToPro = 0;
 
-            fromToPro = (int)MakeSquare(move.From) << AperyBook.FromShift;
+            fromToPro = ((int)MakeSquare(move.To) << AperyBook.ToShift);
 
             if (move.MoveType.HasFlag(MoveType.DropFlag))
             {
-                fromToPro |= (AperyBook.DropOfs + (int)move.Piece.TypeOf().ConvAperyPieceType()) << AperyBook.ToShift;
+                fromToPro |= (AperyBook.DropOfs + (int)move.Piece.TypeOf().ConvAperyPieceType()) << AperyBook.FromShift;
             }
             else
             {
-                fromToPro |= ((int)MakeSquare(move.To) << AperyBook.ToShift);
+                fromToPro |= (int)MakeSquare(move.From) << AperyBook.FromShift;
                 if (move.MoveType.HasFlag(MoveType.Promotion))
                 {
                     fromToPro |= AperyBook.PromoBit;
