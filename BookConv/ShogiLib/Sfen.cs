@@ -67,6 +67,25 @@ namespace ShogiLib
             return sfen;
         }
 
+        /// <summary>
+        /// 指し手文字列を返す
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public static string MoveToString(MoveData move)
+        {
+            string sfen = string.Empty;
+
+            using (StringWriter wr = new StringWriter())
+            {
+                WriteMove(move, wr);
+
+                sfen = wr.ToString();
+            }
+
+            return sfen;
+        }
+
         ///////////////////////////////////////////////////////////////////// 
 
         /// <summary>

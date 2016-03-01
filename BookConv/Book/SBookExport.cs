@@ -91,10 +91,11 @@ namespace ShogiLib
         }
 
         /// <summary>
-        /// 最大指し手と最大レベルを求めるために棋譜を全部舐める
+        /// 指し手の出力
         /// </summary>
-        /// <param name="move_data"></param>
-        /// <param name="level"></param>
+        /// <param name="bookstate"></param>
+        /// <param name="position"></param>
+        /// <param name="aperyBook"></param>
         private static void WriteMoves(SBookState bookstate, SPosition position, AperyBook aperyBook)
         {
             if (bookstate == null)

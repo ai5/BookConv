@@ -59,6 +59,8 @@ namespace BookConv
                 this.saveFileDialog1.FileName = this.outputTextBox.Text;
             }
 
+            this.saveFileDialog1.FilterIndex = this.comboBox1.SelectedIndex + 1;
+
             if (this.saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 this.outputTextBox.Text = this.saveFileDialog1.FileName;
@@ -87,7 +89,15 @@ namespace BookConv
                 // 面倒なのでここでやる
                 SBook book = SBook.Load(this.inputTextBox.Text);
 
-                SBookExport.ExportAperyBook(book, outputTextBox.Text);
+                if (this.comboBox1.SelectedIndex == (int)BookFormat.YaneuraOu2016)
+                {
+                    book.ExportYaneuraOUbook(this.outputTextBox.Text);
+                }
+                else
+                {
+                    book.ExportAperyBook(this.outputTextBox.Text);
+                }
+
                 Cursor.Current = keep;
 
                 MessageBox.Show("完了", "メッセージ", MessageBoxButtons.OK);
@@ -97,6 +107,26 @@ namespace BookConv
                 Cursor.Current = keep;
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK);
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Settings.Load();
+
+            this.inputTextBox.Text = Settings.InputFile;
+            this.outputTextBox.Text = Settings.OutputFile;
+            if (Settings.BookFormat >= 0 && (int)Settings.BookFormat < this.comboBox1.Items.Count)
+            {
+                this.comboBox1.SelectedIndex = (int)Settings.BookFormat;
+            }
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Settings.InputFile = this.inputTextBox.Text;
+            Settings.OutputFile = this.outputTextBox.Text;
+            Settings.BookFormat = (BookFormat)this.comboBox1.SelectedIndex;
+            Settings.Save();
         }
     }
 }

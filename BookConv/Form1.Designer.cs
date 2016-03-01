@@ -37,10 +37,13 @@
             this.outputSelectButton = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // inputTextBox
             // 
+            this.inputTextBox.AllowDrop = true;
             this.inputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.inputTextBox.Location = new System.Drawing.Point(87, 14);
@@ -70,6 +73,7 @@
             // 
             // outputTextBox
             // 
+            this.outputTextBox.AllowDrop = true;
             this.outputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.outputTextBox.Location = new System.Drawing.Point(87, 48);
@@ -119,13 +123,36 @@
             // 
             // saveFileDialog1
             // 
-            this.saveFileDialog1.Filter = "Apery Book(*.bin)|*.bin|すべてのファイル|*.*";
+            this.saveFileDialog1.Filter = "Apery Book(*.bin)|*.bin|やねうら王2016(*.db)|*.db|すべてのファイル|*.*";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "Apery",
+            "やねうら王2016"});
+            this.comboBox1.Location = new System.Drawing.Point(87, 82);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(259, 20);
+            this.comboBox1.TabIndex = 7;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(13, 85);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(29, 12);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "形式";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(429, 206);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.outputSelectButton);
             this.Controls.Add(this.inputSelectButton);
             this.Controls.Add(this.convButton);
@@ -135,6 +162,8 @@
             this.Controls.Add(this.inputTextBox);
             this.Name = "Form1";
             this.Text = "定跡変換";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -151,6 +180,8 @@
         private System.Windows.Forms.Button outputSelectButton;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Label label3;
     }
 }
 
