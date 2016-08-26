@@ -180,6 +180,26 @@ namespace ShogiLib
         }
 
         /// <summary>
+        /// 反転する
+        /// </summary>
+        public void Flip()
+        {
+            int sqe = Square.NSQUARE - 1;
+
+            for (int sq = 0; sq < Square.SQ55; sq++, sqe--)
+            {
+                Piece tmpPiece = this.board[sq];
+                this.board[sq] = this.board[sqe].Opp();
+                this.board[sqe] = tmpPiece.Opp();
+            }
+
+            int[] tmp = new int[HandMax];
+            Array.Copy(this.blackHand, tmp, HandMax);
+            Array.Copy(this.whiteHand, this.blackHand, HandMax);
+            Array.Copy(tmp, this.whiteHand, HandMax);
+        }
+
+        /// <summary>
         /// 駒の移動
         /// </summary>
         /// <param name="moveData"></param>

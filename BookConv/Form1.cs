@@ -93,6 +93,10 @@ namespace BookConv
                 {
                     book.ExportYaneuraOUbook(this.outputTextBox.Text);
                 }
+                else if (this.comboBox1.SelectedIndex == (int)BookFormat.Gikou)
+                {
+                    book.ExportGikou(this.outputTextBox.Text);
+                }
                 else
                 {
                     book.ExportAperyBook(this.outputTextBox.Text);

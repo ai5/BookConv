@@ -10,5 +10,6 @@ namespace BookConv
     {
         Apery,
         YaneuraOu2016,
+        Gikou
     }
 }

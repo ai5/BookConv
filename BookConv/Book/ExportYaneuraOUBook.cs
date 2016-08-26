@@ -11,7 +11,7 @@ namespace ShogiLib
     public static class ExportYaneuraOUBook
     {
         /// <summary>
-        /// SBookをAperyBookに変換して保存する
+        /// SBookをYaneuraou book形式に変換して保存する
         /// </summary>
         /// <param name="book"></param>
         /// <param name="filename"></param>
