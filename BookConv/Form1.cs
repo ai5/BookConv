@@ -99,7 +99,7 @@ namespace BookConv
                 }
                 else
                 {
-                    book.ExportAperyBook(this.outputTextBox.Text);
+                    book.ExportApery(this.outputTextBox.Text);
                 }
 
                 Cursor.Current = keep;

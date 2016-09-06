@@ -10,7 +10,7 @@ using Apery;
 
 namespace ShogiLib
 {
-    public static class SBookExport
+    public static class ExportAperyBook
     {
         private static readonly Dictionary<PieceType, AperyPieceType> PieceTypeTable = new Dictionary<PieceType, AperyPieceType>()
         {
@@ -62,7 +62,7 @@ namespace ShogiLib
         /// </summary>
         /// <param name="book"></param>
         /// <param name="filename"></param>
-        public static void ExportAperyBook(this SBook book, string filename)
+        public static void ExportApery(this SBook book, string filename)
         {
             // 初期局面の出力
             AperyBook aperyBook = new AperyBook();
