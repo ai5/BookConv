@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,7 +88,16 @@ namespace BookConv
             try
             {
                 // 面倒なのでここでやる
-                SBook book = SBook.Load(this.inputTextBox.Text);
+                SBook book;
+                
+                if (Path.GetExtension(this.inputTextBox.Text).ToLower() == ".db")
+                {
+                    book = ImportYaneuraOuBook.ImportYaneuraOu(this.inputTextBox.Text);
+                }
+                else
+                {
+                    book = SBook.Load(this.inputTextBox.Text);
+                }
 
                 if (this.comboBox1.SelectedIndex == (int)BookFormat.YaneuraOu2016)
                 {
@@ -96,6 +106,10 @@ namespace BookConv
                 else if (this.comboBox1.SelectedIndex == (int)BookFormat.Gikou)
                 {
                     book.ExportGikou(this.outputTextBox.Text);
+                }
+                else if (this.comboBox1.SelectedIndex == (int)BookFormat.SBK)
+                {
+                    book.Save(this.outputTextBox.Text);
                 }
                 else
                 {

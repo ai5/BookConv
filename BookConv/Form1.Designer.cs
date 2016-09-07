@@ -132,7 +132,8 @@
             this.comboBox1.Items.AddRange(new object[] {
             "Apery",
             "やねうら王2016",
-            "技巧"});
+            "技巧",
+            "SBK"});
             this.comboBox1.Location = new System.Drawing.Point(87, 82);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(259, 20);

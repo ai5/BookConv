@@ -294,6 +294,57 @@ namespace ShogiLib
         }
 
         /// <summary>
+        /// sfen形式の棋譜読み込み
+        /// </summary>
+        /// <param name="notation"></param>
+        /// <param name="sr"></param>
+        public static void ReadNotation(SPosition pos, string str)
+        {
+            Tokenizer tok = new Tokenizer(str);
+            string token;
+
+            token = tok.Token();
+            if (token == "position")
+            {
+                token = tok.Token();
+            }
+
+            if (token == "startpos")
+            {
+                // 処理なし
+            }
+            else if (token == "sfen")
+            {
+                Sfen.ReadPosition(pos, tok.TokenPosition());
+            }
+            else if (token == "moves")
+            {
+                tok.Push(token);
+            }
+            else
+            {
+            }
+
+            token = tok.Token();
+            if (token == "moves")
+            {
+                while ((token = tok.Token()) != string.Empty)
+                {
+                    MoveData moveData = ParseMove(pos, token);
+                    if (moveData == null)
+                    {
+                        break;
+                    }
+
+                    if (!pos.Move(moveData))
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// fileを返す
         /// </summary>
         /// <param name="ch"></param>
@@ -538,6 +589,112 @@ namespace ShogiLib
                 }
             }
         }     
+
+        /// <summary>
+        /// 指し手文字列をパースして指し手を返す
+        /// </summary>
+        public static MoveData ParseMove(SPosition position, string move)
+        {
+            if (move == "resign")
+            {
+                return new MoveData(MoveType.Resign);
+            }
+            else if (move == "win")
+            {
+                // 反則勝ち
+                return new MoveData(MoveType.WinNyugyoku);
+            }
+            else if (move == "draw")
+            {
+                return new MoveData(MoveType.Draw);
+            }
+            else if (move == "pass" || move == "0000")
+            {
+                // uci的には0000でgpsはpass
+                return new MoveData(MoveType.Pass);
+            }
+
+            if (move.Length < 4)
+            {
+                return null;
+            }
+
+            MoveData moveData = new MoveData();
+
+            if (move[1] == '*')
+            {
+                // 打つ手
+                moveData.MoveType = MoveType.Drop;
+
+                PieceType pieceType;
+
+                if (CharToPieceHashtable.TryGetValue((char)move[0], out pieceType))
+                {
+                    moveData.Piece = (Piece)pieceType | PieceExtensions.PieceFlagFromColor(position.Turn);
+                }
+                else
+                {
+                    // 不明な文字列
+                    moveData.Piece = Piece.NoPiece;
+                }
+
+                int file = FileFromChar(move[2]);
+                int rank = RankFromChar(move[3]);
+
+                if (file < 0 || rank < 0)
+                {
+                    return null;
+                }
+
+                moveData.ToSquare = Square.Make(file, rank);
+            }
+            else
+            {
+                // 移動
+                moveData.MoveType = MoveType.Normal;
+
+                // from
+                int file = FileFromChar(move[0]);
+                int rank = RankFromChar(move[1]);
+
+                moveData.FromSquare = Square.Make(file, rank);
+
+                file = FileFromChar(move[2]);
+                rank = RankFromChar(move[3]);
+                if (file < 0 || rank < 0)
+                {
+                    return null;
+                }
+
+                moveData.ToSquare = Square.Make(file, rank);
+
+                moveData.Piece = position.GetPiece(moveData.FromSquare);
+
+                if (move.Length >= 5 && move[4] == '+')
+                {
+                    // 成り
+                    moveData.MoveType = MoveType.Promotion;
+                }
+            }
+
+            // 盤面を進める
+            if (moveData.MoveType.IsMoveWithoutPass())
+            {
+                // 指し手の場合
+                if (position.MoveLast.MoveType.IsMove() && moveData.ToSquare == position.MoveLast.ToSquare)
+                {
+                    moveData.MoveType |= MoveType.Same; // 同ほげ用のフラグ設定
+                }
+
+                if (position.GetPiece(moveData.ToSquare) != Piece.NoPiece)
+                {
+                    moveData.MoveType |= MoveType.Capture; // 駒とったフラグ設定
+                    moveData.CapturePiece = position.GetPiece(moveData.ToSquare); // 駒をいれる
+                }
+            }
+
+            return moveData;
+        }
     }
 
     /// <summary>

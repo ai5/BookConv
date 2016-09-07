@@ -18,6 +18,13 @@ namespace ShogiLib
     // オンメモリのBook
     public partial class SBook
     {
+        private readonly Dictionary<string, SBookState> books = new Dictionary<string, SBookState>();
+
+        public Dictionary<string, SBookState> Books
+        {
+            get { return this.books; }
+        }
+
         /// <summary>
         /// 読み込み
         /// </summary>
@@ -54,6 +61,128 @@ namespace ShogiLib
             foreach (SBookState state in this.BookStates)
             {
                 state.Count = 0;
+            }
+        }
+
+        /// <summary>
+        /// stateの取得
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public SBookState GetBookState(string key)
+        {
+            SBookState state;
+
+            if (!this.books.TryGetValue(key, out state))
+            {
+                state = null;
+            }
+
+            return state;
+        }
+
+        /// <summary>
+        /// 局面追加
+        /// </summary>
+        public void Add(SPosition pos, MoveData moveData, int weight, int value, int depth)
+        {
+            string key = pos.PositionToString(1); 
+
+            SBookState state = this.GetBookState(key);
+
+            if (state == null)
+            {
+                // 現在の局面がない場合
+                state = new SBookState();
+                state.Games = 1;
+                state.WonBlack = 0;
+                state.WonWhite = 0;
+
+                state.Position = key;
+
+                this.books.Add(key, state);
+                this.BookStates.Add(state);
+            }
+
+            if (moveData != null)
+            {
+                pos.Move(moveData);
+                string next_key = pos.PositionToString(1); 
+                SBookState next_state = this.GetBookState(next_key);
+                pos.UnMove(moveData, null);
+
+                if (next_state == null)
+                {
+                    next_state = new SBookState();
+                    next_state.Games = 1;
+                    next_state.WonBlack = 0;
+                    next_state.WonWhite = 0;
+
+                    next_state.Position = next_key;
+
+                    this.books.Add(next_key, next_state);
+                    this.BookStates.Add(next_state);
+                }
+
+                SBookMove m = new SBookMove(moveData, next_state);
+                SBookMove move = state.GetMove(m);
+            
+                if (move == null)
+                {
+                    // 指し手が無い場合は追加
+                    m.Weight = weight;
+                    m.Value = value;
+                    m.Depth = depth;
+                    state.AddMove(m);
+
+                    // next_stateのPositionをクリアする
+                    next_state.Position = string.Empty;
+                    move = m;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Save(string filename)
+        {
+            // idの付け直し
+            this.SetIds();
+
+            // 書き込み
+            using (Stream wr = new FileStream(filename, FileMode.Create))
+            {
+                Serializer.Serialize(wr, this);
+            }
+        }
+
+        /// <summary>
+        /// IDの再設定
+        /// </summary>
+        public void SetIds()
+        {
+            int id = 0;
+            foreach (SBookState state in this.BookStates)
+            {
+                state.Id = id++;
+            }
+
+            // 指し手のIDをポインタに変換する
+            foreach (SBookState state in this.BookStates)
+            {
+                foreach (SBookMove move in state.Moves)
+                {
+                    if (move.NextState != null)
+                    {
+                        move.NextStateId = move.NextState.Id;
+                    }
+                    else
+                    {
+                        move.NextStateId = -1;
+                    }
+                }
             }
         }
     }
@@ -106,7 +235,20 @@ namespace ShogiLib
         private const int PieceMask = 0x1f;
 
         public SBookState NextState;
-      
+
+        public int Value = 0;
+
+        public int Depth = 0;
+
+        public SBookMove(MoveData movedata, SBookState state)
+        {
+            this.NextState = state;
+
+            this.Move = SBookMove.MoveFromMoveData(movedata);
+            this.Evalution = SBookMoveEvalution.None;
+            this.Weight = 1;
+        }
+
         public int From
         {
             get

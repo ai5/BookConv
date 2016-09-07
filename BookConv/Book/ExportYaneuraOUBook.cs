@@ -93,7 +93,7 @@ namespace ShogiLib
                             next_str = Sfen.MoveToString(nextMoveData);
                         }
 
-                        wr.WriteLine("{0} {1} 0 32 {2}", Sfen.MoveToString(moveData), next_str, move.Weight);
+                        wr.WriteLine("{0} {1} {3} {4} {2}", Sfen.MoveToString(moveData), next_str, move.Weight, move.Value, move.Depth);
                     }
                 }
             }

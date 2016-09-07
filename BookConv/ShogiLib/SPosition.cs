@@ -895,6 +895,12 @@ namespace ShogiLib
             {
                 this.board[i] = Piece.NoPiece;
             }
+
+            for (int i = 0; i < HandMax; i++)
+            {
+                this.blackHand[i] = 0;
+                this.whiteHand[i] = 0;
+            }
         }
 
         /// <summary>

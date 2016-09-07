@@ -55,6 +55,7 @@
     <Compile Include="Book\book.cs" />
     <Compile Include="Book\ExportYaneuraOUBook.cs" />
     <Compile Include="Book\ExportGikouBook.cs" />
+    <Compile Include="Book\ImportYaneuraOuBook.cs" />
     <Compile Include="Book\SBook.cs" />
     <Compile Include="Book\ExportAperyBook.cs" />
     <Compile Include="Form1.cs">

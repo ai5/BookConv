@@ -93,7 +93,7 @@ namespace ShogiLib
                 {
                     if (move.Weight != 0)
                     {
-                        gikouBook.Add(key, (uint)move.Weight, (uint)move.Weight, move.ConvertGikouMove());
+                        gikouBook.Add(key, (uint)move.Weight, (uint)move.Weight, move.Value, move.ConvertGikouMove());
                     }
                 }
             }
@@ -204,7 +204,7 @@ namespace ShogiLib
         /// <summary>
         /// 追加
         /// </summary>
-        public void Add(long key, uint frequency, uint win_count, GikouMove move)
+        public void Add(long key, uint frequency, uint win_count, int score, GikouMove move)
         {
             GikouBookEntry entry = new GikouBookEntry()
             {
@@ -212,6 +212,7 @@ namespace ShogiLib
                 Move = move,
                 Frequency = frequency,
                 WinCount = win_count,
+                Score = score,
             };
 
             if (!this.entries.ContainsKey(key))
