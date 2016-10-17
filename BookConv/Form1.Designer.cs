@@ -119,7 +119,7 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "ShogiGUI定跡ファイル(*.sbk)|*.sbk";
+            this.openFileDialog1.Filter = "ShogiGUI定跡ファイル(*.sbk)|*.sbk|やねうら王定跡(*.db)|*.db";
             // 
             // saveFileDialog1
             // 
