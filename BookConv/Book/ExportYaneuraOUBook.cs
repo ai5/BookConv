@@ -71,12 +71,12 @@ namespace ShogiLib
                 }
             }
 
+            bookstate.Count++;
+
             if (count != 0)
             {
                 // 局面の出力
                 wr.WriteLine("sfen " + position.PositionToString(depth));
-
-                bookstate.Count++;
 
                 foreach (SBookMove move in bookstate.Moves)
                 {

@@ -75,6 +75,8 @@ namespace ShogiLib
                 return; // 既に出力した
             }
 
+            bookstate.Count++;
+
             int count = 0;
             foreach (SBookMove move in bookstate.Moves)
             {
@@ -86,7 +88,6 @@ namespace ShogiLib
 
             if (count != 0)
             {
-                bookstate.Count++;
                 long key = ComputeKey(position, gikouBook);
 
                 foreach (SBookMove move in bookstate.Moves)
