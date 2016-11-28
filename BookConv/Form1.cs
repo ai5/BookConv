@@ -94,6 +94,10 @@ namespace BookConv
                 {
                     book = ImportYaneuraOuBook.ImportYaneuraOu(this.inputTextBox.Text);
                 }
+                else if (Path.GetExtension(this.inputTextBox.Text).ToLower() == ".bin")
+                {
+                    book = ImportGikouBook.Import(this.inputTextBox.Text);
+                }
                 else
                 {
                     book = SBook.Load(this.inputTextBox.Text);

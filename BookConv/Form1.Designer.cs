@@ -119,11 +119,11 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "ShogiGUI定跡ファイル(*.sbk)|*.sbk|やねうら王定跡(*.db)|*.db";
+            this.openFileDialog1.Filter = "ShogiGUI定跡ファイル(*.sbk)|*.sbk|やねうら王定跡(*.db)|*.db|技巧定跡(book.bin)|*.bin";
             // 
             // saveFileDialog1
             // 
-            this.saveFileDialog1.Filter = "Apery Book(*.bin)|*.bin|やねうら王2016(*.db)|*.db|すべてのファイル|*.*";
+            this.saveFileDialog1.Filter = "Apery or 技巧(*.bin)|*.bin|やねうら王2016(*.db)|*.db|すべてのファイル|*.*";
             // 
             // comboBox1
             // 

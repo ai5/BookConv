@@ -119,7 +119,7 @@ namespace ShogiLib
         /// <param name="position"></param>
         /// <param name="gikouBook"></param>
         /// <returns></returns>
-        private static long ComputeKey(SPosition position, GikouBook gikouBook)
+        public static long ComputeKey(SPosition position, GikouBook gikouBook)
         {
             long key = 0;
 
@@ -189,17 +189,35 @@ namespace ShogiLib
     public class GikouBook
     {
         private SortedList<long, List<GikouBookEntry>> entries;
-        private HashSeeds hashseeds;
+        private GikouHashSeeds hashseeds;
 
         public GikouBook()
         {
             this.entries = new SortedList<long, List<GikouBookEntry>>();
-            this.hashseeds = new HashSeeds();
+            this.hashseeds = new GikouHashSeeds();
+            this.hashseeds.InitHashSeeds();
         }
 
-        public HashSeeds HashSeeds
+        public GikouBook(string filename)
+        {
+            this.entries = new SortedList<long, List<GikouBookEntry>>();
+            this.hashseeds = new GikouHashSeeds();
+            this.Load(filename);
+        }
+
+        public GikouHashSeeds HashSeeds
         {
             get { return this.hashseeds; }
+        }
+
+        public List<GikouBookEntry> GetEntry(long key)
+        {
+            if (!this.entries.ContainsKey(key))
+            {
+                return null;
+            }
+
+            return this.entries[key];
         }
 
         /// <summary>
@@ -225,6 +243,17 @@ namespace ShogiLib
             this.entries[key].Add(entry);
         }
 
+        public void Add(GikouBookEntry entry)
+        {
+            if (!this.entries.ContainsKey(entry.Key))
+            {
+                // ない場合
+                this.entries.Add(entry.Key, new List<GikouBookEntry>());
+            }
+            
+            this.entries[entry.Key].Add(entry);
+        }
+
         /// <summary>
         /// 保存
         /// </summary>
@@ -234,7 +263,7 @@ namespace ShogiLib
             using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
             {
                 // hashseedを書き込む
-                fs.Write(this.hashseeds.GetBytes(), 0, HashSeeds.HashSeedSize);
+                fs.Write(this.hashseeds.GetBytes(), 0, GikouHashSeeds.HashSeedSize);
 
                 // 指し手を書き込む
                 foreach (var kvp in this.entries)
@@ -249,9 +278,32 @@ namespace ShogiLib
             }
         }
 
+        public void Load(string filename)
+        {
+            using (FileStream sr = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            {
+                this.hashseeds.Load(sr);
+                this.LoadEntrys(sr);
+            }
+        }
+
+        private void LoadEntrys(Stream sr)
+        {
+            byte[] data = new byte[GikouBookEntry.EntrySize];
+
+            while (true)
+            {
+                int len = sr.Read(data, 0, GikouBookEntry.EntrySize);
+
+                if (len < GikouBookEntry.EntrySize) break;
+
+                GikouBookEntry entry = GikouBookEntry.FromBytes(data, 0);
+                this.Add(entry);
+            }
+        }
     }
 
-    public class HashSeeds
+    public class GikouHashSeeds
     {
         private long[,] psq = new Int64[GikouPiece.Number, GikouSquare.Number];
         private long[,] hands = new Int64[GikouColor.Number, GikouPieceType.Number];
@@ -260,8 +312,12 @@ namespace ShogiLib
         private const int HandsSize= (8 * GikouColor.Number * GikouPieceType.Number);
         public const int HashSeedSize = PsqSize + HandsSize;
 
-        public HashSeeds()
+        public GikouHashSeeds()
         {
+        }
+
+        public void InitHashSeeds()
+        { 
             Random rand = new Random(0);
 
             for (int pc = GikouPiece.Min; pc <= GikouPiece.Max; pc++)
@@ -320,6 +376,36 @@ namespace ShogiLib
             }
 
             return bin;
+        }
+
+        /// <summary>
+        /// 読み込み
+        /// </summary>
+        /// <param name="sr"></param>
+        public void Load(Stream sr)
+        {
+            byte[] data = new byte[HashSeedSize];
+
+            sr.Read(data, 0, HashSeedSize);
+            int ofs = 0;
+
+            for (int piece = 0; piece < GikouPiece.Number; piece++)
+            {
+                for (int sq = 0; sq < GikouSquare.Number; sq++)
+                {
+                    this.psq[piece, sq] = BitConverter.ToInt64(data, ofs);
+                    ofs += 8;
+                }
+            }
+
+            for (int color = 0; color < GikouColor.Number; color++)
+            {
+                for (int pt = 0; pt < GikouPieceType.Number; pt++)
+                {
+                    this.hands[color, pt] = BitConverter.ToInt64(data, ofs);
+                    ofs += 8;
+                }
+            }
         }
     }
 
@@ -407,6 +493,15 @@ namespace ShogiLib
         {
             return PrimitiveConversion.ToUint(this);
         }
+
+        public void Set(uint data)
+        {
+            ValueType vt = this;
+            
+            PrimitiveConversion.Set(vt, data);
+
+            this = (GikouMove)vt;
+        }
     }
 
     public class GikouBookEntry
@@ -437,6 +532,20 @@ namespace ShogiLib
             Array.Copy(BitConverter.GetBytes(this.Score), 0, bin, 24, 4);
 
             return bin;
+        }
+
+        public static GikouBookEntry FromBytes(byte[] data, int ofs)
+        {
+            GikouBookEntry entry = new GikouBookEntry();
+
+            entry.Key = BitConverter.ToInt64(data, ofs + 0);
+            entry.Move.Set(BitConverter.ToUInt32(data, ofs + 8));
+            entry.Frequency = BitConverter.ToUInt32(data, ofs + 12);
+            entry.WinCount = BitConverter.ToUInt32(data, ofs + 16);
+            entry.Opening = BitConverter.ToUInt32(data, ofs + 20);
+            entry.Score = BitConverter.ToInt32(data, ofs + 24);
+
+            return entry;
         }
     }
 
@@ -484,6 +593,30 @@ namespace ShogiLib
             }
 
             return r;
+        }
+
+        public static void Set<T>(T t, uint val)
+        {
+            int offset = 0;
+
+            // For every field suitably attributed with a BitfieldLength
+            foreach (System.Reflection.FieldInfo f in t.GetType().GetFields())
+            {
+                object[] attrs = f.GetCustomAttributes(typeof(BitfieldLengthAttribute), false);
+                if (attrs.Length == 1)
+                {
+                    uint fieldLength = ((BitfieldLengthAttribute)attrs[0]).Length;
+
+                    // Calculate a bitmask of the desired length
+                    uint mask = 0;
+                    for (int i = 0; i < fieldLength; i++)
+                        mask |= 1u << i;
+
+                    f.SetValue(t, (uint)(val >> offset) & mask);
+
+                    offset += (int)fieldLength;
+                }
+            }
         }
     }
 }
