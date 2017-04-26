@@ -253,12 +253,21 @@ namespace ShogiLib
             Debug.Assert(moveData.FromSquare >= 0 && moveData.FromSquare < Square.NSQUARE, "引数エラー");
 
             // from側に駒がある
-            Debug.Assert(this.board[moveData.FromSquare] != Piece.NoPiece, "引数エラー");
+            if (!(this.board[moveData.FromSquare] != Piece.NoPiece))
+            {
+                Debug.Assert(false, "引数エラー");
+                return false;
+            }
+
             // 色が一致 2手差し対応のため色チェックは外す
             //            Debug.Assert(this.board[move_data.from_square].ColorOf() == turn);
 
             // 移動先が空白か相手の駒
-            Debug.Assert((this.board[moveData.ToSquare] == Piece.NoPiece) || (this.board[moveData.ToSquare].ColorOf() == this.turn.Opp()), "引数エラー");
+            if (!((this.board[moveData.ToSquare] == Piece.NoPiece) || (this.board[moveData.ToSquare].ColorOf() == this.turn.Opp())))
+            {
+                Debug.Assert(false, "引数エラー");
+                return false;
+            }
 
             piece = moveData.Piece | PieceExtensions.PieceFlagFromColor(this.turn);  // 棋譜からの指し手だと色フラグが付いていないので現在のターンで先後を決める
 

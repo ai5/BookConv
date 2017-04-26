@@ -119,12 +119,14 @@ namespace ShogiLib
 
                 MoveData moveData = move.GetMoveData();
 
-                position.Move(moveData);
+                if (position.Move(moveData))
+                {
 
-                // 再帰呼び出し
-                WriteMoves(move.NextState, position, aperyBook);
+                    // 再帰呼び出し
+                    WriteMoves(move.NextState, position, aperyBook);
 
-                position.UnMove(moveData, null);
+                    position.UnMove(moveData, null);
+                }
             }
         }
 

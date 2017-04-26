@@ -103,12 +103,14 @@ namespace ShogiLib
                 // 指し手の出力
                 MoveData moveData = move.GetMoveData();
 
-                position.Move(moveData);
+                if (position.Move(moveData))
+                {
 
-                // 再帰呼び出し
-                WriteMoves(move.NextState, position, wr, depth + 1);
+                    // 再帰呼び出し
+                    WriteMoves(move.NextState, position, wr, depth + 1);
 
-                position.UnMove(moveData, null);
+                    position.UnMove(moveData, null);
+                }
             }
         }
 
